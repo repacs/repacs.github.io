@@ -48,6 +48,8 @@ export function createScene(renderer) {
       model.rotation.y = Math.random() * (Math.PI * 2);
       model.visible = true;
 
+      model.scale.set(0.12, 0.12, 0.12);
+
       scene.add(model);
     }
   };
