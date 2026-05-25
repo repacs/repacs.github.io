@@ -8,7 +8,7 @@ let trashModel;
 
 const gltfLoader = new GLTFLoader();
 
-gltfLoader.load('../assets/models/trash_can.glb', (gltf) => {
+gltfLoader.load('/assets/models/trash.glb', (gltf) => {
   trashModel = gltf.scene.children[0];
 });
 
