@@ -14,11 +14,12 @@ function initXRGame() {
 
   renderer.xr.enabled = true;
 
-  // document.querySelector('#start-btn').addEventListener('click', initXR);
-  document.body.appendChild(ARButton.createButton(
+  const arButton = ARButton.createButton(
     renderer,
     { requiredFeatures: ["hit-test"] },
-  ));
+  );
+
+  document.querySelector('#ui').appendChild(arButton);
 
   createScene(renderer);
 };
