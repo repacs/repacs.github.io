@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { createPlaneMarker } from './objects/planeMarker';
+import { handleXRHitTest } from './utils/hitTest';
 
 export function createScene(renderer) {
   const scene = new THREE.Scene();
@@ -17,15 +19,31 @@ export function createScene(renderer) {
 
   scene.add(box);
 
+  const planeMarker = createPlaneMarker();
+
+  scene.add(planeMarker);
+
   function renderLoop(timestamp, frame) {
     // Rotate box
     box.rotation.x += 0.01;
     box.rotation.y += 0.01;
 
     if (renderer.xr.isPresenting) {
+
+      if (frame) {
+        handleXRHitTest(renderer, frame, (hitPoseTransformed) => {
+          if (hitPoseTransformed) {
+            planeMarker.visible = true;
+            planeMarker.matrix.fromArray(hitPoseTransformed);
+          }
+        }, () => {
+          planeMarker.visible = false;
+        })
+      }
       renderer.render(scene, camera);    
     }
   };
 
+  
   renderer.setAnimationLoop(renderLoop);
 };
