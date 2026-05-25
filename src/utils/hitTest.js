@@ -1,4 +1,5 @@
-import * as THREE from 'three';
+let hitTestSource;
+let hitTestSourceRequested = false;
 
 export function handleXRHitTest(
   renderer,

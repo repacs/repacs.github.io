@@ -17,7 +17,7 @@ export function createScene(renderer) {
   const box = new THREE.Mesh(boxGeometry, boxMaterial);
   box.position.z = -3;
 
-  scene.add(box);
+  // scene.add(box);
 
   const planeMarker = createPlaneMarker();
 
@@ -25,8 +25,8 @@ export function createScene(renderer) {
 
   function renderLoop(timestamp, frame) {
     // Rotate box
-    box.rotation.x += 0.01;
-    box.rotation.y += 0.01;
+    // box.rotation.x += 0.01;
+    // box.rotation.y += 0.01;
 
     if (renderer.xr.isPresenting) {
 
@@ -44,6 +44,6 @@ export function createScene(renderer) {
     }
   };
 
-  
+
   renderer.setAnimationLoop(renderLoop);
 };
