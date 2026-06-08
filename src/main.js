@@ -27,7 +27,7 @@ function initXR() {
 
   // 5. Steuerung von Groups, unser Szenenmanagement 
   const menuGroup = createMenuGroup(camera, renderer, {
-    onStart: () => console.log('Starte Spiel!'),
+    onStart: () => switchTo('game'),
     onInfo: () => console.log('Info'),
     onQuit: () => console.log('Beende Spiel!'),
   });
@@ -36,6 +36,14 @@ function initXR() {
 
   scene.add(menuGroup);
   scene.add(gameGroup);
+
+  // Start: nur Menü sichtbar
+  gameGroup.visible = false;
+
+  function switchTo(state) {
+    menuGroup.visible = state === 'menu';
+    gameGroup.visible = state === 'game';
+  }
   
   // Controller enthält alle Controller-Informationen (Position, Rotation etc.) in Matrix
   // Controller Zeug ...
