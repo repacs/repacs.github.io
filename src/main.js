@@ -4,7 +4,6 @@ import { ARButton } from 'three/addons/webxr/ARButton.js';
 import { browserHasImmersiveARCompatibility } from './utils/domUtils';
 import { createGameGroup } from './groups/gameGroup';
 import { createMenuGroup } from './groups/menuGroup';
-import { handleXRHitTest } from './utils/hitTest';
 
 function initXR() {
   // 1. Szene erstellen
@@ -59,29 +58,9 @@ function initXR() {
   // Controller enthält alle Controller-Informationen (Position, Rotation etc.) in Matrix
   // Controller Zeug ist gerade in den Groups
 
-  // function renderLoop(timestamp, frame) {
-  //   box.rotation.y += 0.01;
-  //   renderer.render(scene, camera);
-  // }
-
-  function renderLoop(timestamp, frame) {
-    // Rotate box
+  function renderLoop() {
     box.rotation.y += 0.01;
-
-    if (renderer.xr.isPresenting) {
-
-      if (frame) {
-        handleXRHitTest(renderer, frame, (hitPoseTransformed) => {
-          if (hitPoseTransformed) {
-            planeMarker.visible = true;
-            planeMarker.matrix.fromArray(hitPoseTransformed);
-          }
-        }, () => {
-          planeMarker.visible = false;
-        })
-      }
-      renderer.render(scene, camera);    
-    }
+    renderer.render(scene, camera);
   }
 
   // 6. Den Animation-Loop starten
