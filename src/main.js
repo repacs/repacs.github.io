@@ -45,6 +45,7 @@ function initXR() {
 
   // Start: nur Menü sichtbar
   gameGroup.visible = false;
+  planeMarker.visible = false;
 
   function switchTo(state) {
     menuGroup.visible = state === 'menu';
@@ -80,4 +81,4 @@ async function start() {
   }
 };
 
-start(); // Spiel startet, wenn Browser XR kompatibel ist
+start(); // Spiel startet, wenn Browser XR kompatibel ist 
