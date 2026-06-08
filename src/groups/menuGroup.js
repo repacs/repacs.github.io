@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export function createMenuGroup(camera, onStart) {
-  const group = THREE.Group();
+  const group = new THREE.Group();
   group.position.set(0, 0, -1.2); // 1.2 Meter vor der Kamera
 
   const canvas = document.createElement('canvas');

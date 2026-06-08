@@ -11,6 +11,7 @@ function initXR() {
 
   // 2. Kamera erstellen (PerspectiveCamera wird für 3D-Szenen empfohlen)
   const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.02, 20);
+  scene.add(camera);
 
   // 3. Renderer erstellen und XR aktivieren
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -26,7 +27,7 @@ function initXR() {
 
   // 5. Steuerung von Groups 
   const menuGroup = createMenuGroup(camera);
-  const gameGroup = createGameGroup();
+  const { group: gameGroup, box } = createGameGroup();
 
   scene.add(menuGroup);
   scene.add(gameGroup);
@@ -34,12 +35,8 @@ function initXR() {
   // Controller enthält alle Controller-Informationen (Position, Rotation etc.) in Matrix
   // Controller Zeug ...
 
-
   function renderLoop() {
-    // Den Würfel leicht drehen
     box.rotation.y += 0.01;
-    
-    // Die Szene rendern
     renderer.render(scene, camera);
   }
 

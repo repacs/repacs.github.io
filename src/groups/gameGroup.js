@@ -16,7 +16,7 @@ export function createGameGroup() {
   const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
   group.add(light);
 
-  return group;
+  return { group, box };
 }
 
 // const scene = new THREE.Scene();
