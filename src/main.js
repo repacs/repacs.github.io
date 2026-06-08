@@ -37,7 +37,7 @@ function initXR() {
     }, 
     onQuit: () => {
       console.log('Beende Spiel!'),
-      switchTo('game')
+      renderer.xr.getSession().end(); // Session beenden
     } 
   });
 
@@ -53,9 +53,13 @@ function initXR() {
     menuGroup.visible = state === 'menu';
     gameGroup.visible = state === 'game';
   }
+
+  renderer.xr.addEventListener('sessionend', () => {
+    switchTo('menu'); // zurück zum Menü wenn Session endet 
+  });
   
   // Controller enthält alle Controller-Informationen (Position, Rotation etc.) in Matrix
-  // Controller Zeug ...
+  // Controller Zeug ist gerade in den Groups
 
   function renderLoop() {
     box.rotation.y += 0.01;
