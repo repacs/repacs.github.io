@@ -4,14 +4,14 @@ export function createMenuGroup(camera, renderer, callbacks) {
   const group = new THREE.Group();
   group.position.set(0, 0, -1.2); // 1.2 Meter vor der Kamera
                                                                                    
-  const startButton = createButton('Spiel starten', new THREE.Vector3(0, 0, 0));
-  // const infoButton  = createButton('Anleitung',     new THREE.Vector3(0, 0.2, 0)); 
-  // const quitButton  = createButton('Spiel beenden', new THREE.Vector3(0, -0.2, 0)); 
+  const startButton = createButton('Spiel starten', new THREE.Vector3(0, 0.0, 0));
+  const infoButton  = createButton('Anleitung',     new THREE.Vector3(0, 0.2, 0)); 
+  const quitButton  = createButton('Spiel beenden', new THREE.Vector3(0, -0.2, 0)); 
 
   // Callback am Button speichern
   startButton.userData.onClick = callbacks.onStart;
-  // infoButton.userData.onClick  = callbacks.onInfo;
-  // quitButton.userData.onClick  = callbacks.onQuit;
+  infoButton.userData.onClick  = callbacks.onInfo;
+  quitButton.userData.onClick  = callbacks.onQuit;
 
   group.add(startButton);
   // group.add(infoButton);
@@ -21,17 +21,15 @@ export function createMenuGroup(camera, renderer, callbacks) {
   const raycaster = new THREE.Raycaster();
   const controller = renderer.xr.getController(0);
 
-  controller.addEventListener('select', () => {
-    // Weltposition der Kamera holen
-    const origin = new THREE.Vector3();
-    const direction = new THREE.Vector3(0, 0, -1);
-    
-    camera.getWorldPosition(origin);
-    camera.getWorldDirection(direction);
-    
-    raycaster.set(origin, direction);
-    
-    const hits = raycaster.intersectObjects([startButton]); //infoButton, quitButton
+ controller.addEventListener('select', () => {
+    const tempMatrix = new THREE.Matrix4();
+    tempMatrix.identity().extractRotation(controller.matrixWorld);
+
+    raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+    raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+
+    const hits = raycaster.intersectObjects([startButton, infoButton]);
+
     if (hits.length > 0) {
       hits[0].object.userData.onClick?.();
     }
