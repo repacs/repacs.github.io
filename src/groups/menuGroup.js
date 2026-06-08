@@ -6,7 +6,7 @@ export function createMenuGroup(camera, renderer, callbacks) {
                                                                                    
   const startButton = createButton('Spiel starten', new THREE.Vector3(0, 0.0, 0));
   const infoButton  = createButton('Anleitung',     new THREE.Vector3(0, 0.2, 0)); 
-  const quitButton  = createButton('Spiel beenden', new THREE.Vector3(0, 0.4, 0)); 
+  const quitButton  = createButton('Spiel beenden', new THREE.Vector3(0, -0.2, 0)); 
 
   // Callback am Button speichern
   startButton.userData.onClick = callbacks.onStart;

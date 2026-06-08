@@ -28,17 +28,17 @@ function initXR() {
   // 5. Steuerung von Groups, Szenenmanagement 
   const menuGroup = createMenuGroup(camera, renderer, {
     onStart: () => {
-      console.log('Starte Spiel!')
-      switchTo('game')
+      console.log('Starte Spiel!');
+      switchTo('game');
     },
     onInfo: () => console.log('Info lol'),
     onQuit: () => {
-      console.log('Beende Spiel!'),
+      console.log('Beende Spiel!');
       renderer.xr.getSession().end(); // Session beenden
     } 
   });
 
-  const { group: gameGroup, update: updateGame } = createGameGroup(renderer, scene);
+  const { group: gameGroup, update: updateGame, planeMarker } = createGameGroup(renderer, scene);
 
   scene.add(menuGroup);
   scene.add(gameGroup);
@@ -49,6 +49,7 @@ function initXR() {
   function switchTo(state) {
     menuGroup.visible = state === 'menu';
     gameGroup.visible = state === 'game';
+    planeMarker.visible = state === 'game';
   }
 
   renderer.xr.addEventListener('sessionend', () => {

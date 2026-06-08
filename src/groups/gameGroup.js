@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { handleXRHitTest } from '../utils/hitTest';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { createRedBox } from '../objects/redBox';
 import { createPlaneMarker } from '../objects/planeMarker';
 
 
@@ -14,7 +13,7 @@ export function createGameGroup(renderer, scene) {
 
   // Plane Marker
   const planeMarker = createPlaneMarker();
-  group.add(planeMarker);
+  scene.add(planeMarker);
 
 
   // GlTF Model
@@ -80,15 +79,7 @@ export function createGameGroup(renderer, scene) {
       });
     }
   }
-
-  // const box = new THREE.Mesh(
-  //   new THREE.BoxGeometry(0.1, 0.1, 0.1), // 10 cm Würfel
-  //   new THREE.MeshStandardMaterial({ color: 0xff0000 })
-  // );
-  // box.position.set(0, 0, -0.5); // 50 cm vor den Nutzer platzieren
-  // group.add(box);
-  
-  return { group, update };
+  return { group, update, planeMarker };
 }
 
 // const scene = new THREE.Scene();
