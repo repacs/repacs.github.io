@@ -4,32 +4,91 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { createRedBox } from '../objects/redBox';
 import { createPlaneMarker } from '../objects/planeMarker';
 
-let trashModel;
 
-const gltfLoader = new GLTFLoader();
-
-gltfLoader.load('/assets/models/trash.glb', (gltf) => {
-  trashModel = gltf.scene.children[0];
-});
-
-export function createGameGroup() {
+export function createGameGroup(renderer, scene) {
   const group = new THREE.Group();
 
-  // game zeug hier rein
-
-  const box = createRedBox();
-  box.position.set(0, 0, -0.5); // 50 cm vor den Nutzer platzieren
-  group.add(box);
-
   // Platzier Logik für Mülleimer und Tisch
+  const placeableGroup = new THREE.Group();
+  group.add(placeableGroup);
 
-  // Licht hinzufügen, damit Material sichtbar ist
-  const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-  group.add(light);
+  // Plane Marker
+  const planeMarker = createPlaneMarker();
+  group.add(planeMarker);
 
+
+  // GlTF Model
+  let trashModel;
+  const gltfLoader = new GLTFLoader();
+  gltfLoader.load('/assets/models/trash.glb', (gltf) => {
+    trashModel = gltf.scene.children[0];
+  });
+
+  // Licht
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+  group.add(ambientLight);
+
+  // State
+  let phase = 'placing';
+  let placedCount = 0;
+  const OBJECTS_TO_PLACE = 2;
+
+  // Controller
+  const controller = renderer.xr.getController(0);
+  scene.add(controller);
+
+  controller.addEventListener('select', () => {
+    if (phase === 'placing') {
+      onPlace();
+    } else if (phase === 'playing') {
+      onPlay();
+    }
+  });
+
+  function onPlace() {
+    if (!planeMarker.visible || !trashModel) return;
+
+    const model = trashModel.clone();
+    model.position.setFromMatrixPosition(planeMarker.matrix);
+    model.rotation.y = Math.random() * (Math.PI * 2);
+    model.scale.set(0.12, 0.12, 0.12);
+    model.visible = true;
+
+    placeableGroup.add(model); // in placeableGroup, nicht scene
+    placedCount++;
+
+    if (placedCount >= OBJECTS_TO_PLACE) {
+      // Platzierphase vorbei
+      phase = 'playing';
+      planeMarker.visible = false;
+      console.log('Platzierphase vorbei, Spiel startet!');
+    }
+  }
+
+  function onPlay() {
+    // spätere Spiellogik hier
+    console.log('Tap während Spielphase!');
+  }
+
+  function update(frame) {
+    if (phase === 'placing' && frame) {
+      handleXRHitTest(renderer, frame, (hitPoseTransformed) => {
+        planeMarker.visible = true;
+        planeMarker.matrix.fromArray(hitPoseTransformed);
+      }, () => {
+        planeMarker.visible = false;
+      });
+    }
+  }
+
+  // const box = new THREE.Mesh(
+  //   new THREE.BoxGeometry(0.1, 0.1, 0.1), // 10 cm Würfel
+  //   new THREE.MeshStandardMaterial({ color: 0xff0000 })
+  // );
+  // box.position.set(0, 0, -0.5); // 50 cm vor den Nutzer platzieren
+  // group.add(box);
   
-
-  return { group, box };
+  return { group, update };
 }
 
 // const scene = new THREE.Scene();

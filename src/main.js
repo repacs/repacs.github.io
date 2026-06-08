@@ -38,7 +38,7 @@ function initXR() {
     } 
   });
 
-  const { group: gameGroup, box } = createGameGroup();
+  const { group: gameGroup, update: updateGame } = createGameGroup();
 
   scene.add(menuGroup);
   scene.add(gameGroup);
@@ -58,8 +58,10 @@ function initXR() {
   // Controller enthält alle Controller-Informationen (Position, Rotation etc.) in Matrix
   // Controller Zeug ist gerade in den Groups
 
-  function renderLoop() {
-    box.rotation.y += 0.01;
+  function renderLoop(timestamp, frame) {
+    if (gameGroup.visible) {
+      updateGame(frame); // nur updaten wenn gameGroup aktiv ist
+    }
     renderer.render(scene, camera);
   }
 
