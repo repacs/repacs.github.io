@@ -25,8 +25,13 @@ function initXR() {
   const arButton = ARButton.createButton(renderer, { requiredFeatures: ["hit-test"] });
   document.querySelector('#ui').appendChild(arButton);
 
-  // 5. Steuerung von Groups 
-  const menuGroup = createMenuGroup(camera);
+  // 5. Steuerung von Groups, unser Szenenmanagement 
+  const menuGroup = createMenuGroup(camera, renderer, {
+    onStart: () => console.log('Starte Spiel!'),
+    onInfo: () => console.log('Info'),
+    onQuit: () => console.log('Beende Spiel!'),
+  });
+
   const { group: gameGroup, box } = createGameGroup();
 
   scene.add(menuGroup);
