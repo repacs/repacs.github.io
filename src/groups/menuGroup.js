@@ -1,24 +1,14 @@
 import * as THREE from 'three';
 
-function createButton(position, color = 0x2255ff) {
-  const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(0.3, 0.08, 0.01),
-    new THREE.MeshBasicMaterial({ color })
-  );
-
-  mesh.position.copy(position);
-  mesh.userData.originalColor = color;
-  return mesh;
-}
-
 export function createMenuGroup(camera, renderer, callbacks) {
   const group = new THREE.Group();
-  group.position.set(0, 0, -1.2);
+  group.position.set(0, 0, -1.2); // 1.2 Meter vor der Kamera
+                                                                                   
+  const startButton = createButton('Spiel starten', new THREE.Vector3(0, 0.0, 0));
+  const infoButton  = createButton('Anleitung',     new THREE.Vector3(0, 0.2, 0)); 
+  const quitButton  = createButton('Spiel beenden', new THREE.Vector3(0, -0.2, 0)); 
 
-  const startButton = createButton(new THREE.Vector3(0,  0.1, 0), 0x2255ff);
-  const infoButton  = createButton(new THREE.Vector3(0,  0.0, 0), 0x226622);
-  const quitButton  = createButton(new THREE.Vector3(0, -0.1, 0), 0x882222);
-
+  // Callback am Button speichern
   startButton.userData.onClick = callbacks.onStart;
   infoButton.userData.onClick  = callbacks.onInfo;
   quitButton.userData.onClick  = callbacks.onQuit;
@@ -26,38 +16,47 @@ export function createMenuGroup(camera, renderer, callbacks) {
   group.add(startButton);
   group.add(infoButton);
   group.add(quitButton);
-
-  // An XR-Camera hängen damit es mit der Handy-Bewegung mitgeht
-  renderer.xr.addEventListener('sessionstart', () => {
-    const xrCamera = renderer.xr.getCamera();
-    xrCamera.add(group);
-  });
+  camera.add(group);
 
   const raycaster = new THREE.Raycaster();
   const controller = renderer.xr.getController(0);
 
-  controller.addEventListener('select', () => {
-    if (!group.visible) return;
+ controller.addEventListener('select', () => {
+    const tempMatrix = new THREE.Matrix4();
+    tempMatrix.identity().extractRotation(controller.matrixWorld);
 
-    const origin = new THREE.Vector3();
-    const direction = new THREE.Vector3();
+    raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+    raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
 
-    camera.getWorldPosition(origin);
-    camera.getWorldDirection(direction);
-
-    raycaster.set(origin, direction);
-
-    const hits = raycaster.intersectObjects([startButton, infoButton, quitButton]);
+    const hits = raycaster.intersectObjects([startButton, infoButton]);
 
     if (hits.length > 0) {
-      const hit = hits[0].object;
-
-      hit.material.color.set(0xffffff);
-      setTimeout(() => hit.material.color.set(hit.userData.originalColor), 200);
-
-      hit.userData.onClick?.();
+      hits[0].object.userData.onClick?.();
     }
   });
 
   return group;
+}
+
+function createButton(label, position) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = 'blue';
+  ctx.fillRect(0, 0, 512, 128);
+  ctx.fillStyle = 'white';
+  ctx.font = '48px serif';
+  ctx.fillText(label, 50, 80);
+
+  const texture = new THREE.CanvasTexture(canvas);
+
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.5, 0.125), // 50 cm breit, 12.5 cm hoch        
+    new THREE.MeshBasicMaterial({ map: texture })
+  );
+
+  mesh.position.copy(position);
+  return mesh;
 }
