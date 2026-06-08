@@ -20,11 +20,17 @@ export function createMenuGroup(camera, renderer, callbacks) {
 
   // Raycaster via Screen-Tap (Android)
   const raycaster = new THREE.Raycaster();
+  const controller = renderer.xr.getController(0);
 
-  renderer.domElement.addEventListener('click', () => {
-    raycaster.setFromCamera({ x: 0, y: 0 }, camera);
+  controller.addEventListener('select', () => {
+    const tempMatrix = new THREE.Matrix4();
+    tempMatrix.identity().extractRotation(controller.matrixWorld);
 
-    const hits = raycaster.intersectObjects([startButton, infoButton, quitButton]);
+    raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+    raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+
+    const hits = raycaster.intersectObjects([startButton, infoButton]);
+
     if (hits.length > 0) {
       hits[0].object.userData.onClick?.();
     }

@@ -27,7 +27,10 @@ function initXR() {
 
   // 5. Steuerung von Groups, unser Szenenmanagement 
   const menuGroup = createMenuGroup(camera, renderer, {
-    onStart: () => switchTo('game'),
+    onStart: () => {
+      console.log('Starte Spiel!')
+      switchTo('game')
+    },
     onInfo: () => console.log('Info'),
     onQuit: () => console.log('Beende Spiel!'),
   });
