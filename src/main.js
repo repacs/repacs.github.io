@@ -58,11 +58,17 @@ function initXR() {
   // Controller enthält alle Controller-Informationen (Position, Rotation etc.) in Matrix
   // Controller Zeug ist gerade in den Groups
 
+  // function renderLoop(timestamp, frame) {
+  //   box.rotation.y += 0.01;
+  //   renderer.render(scene, camera);
+  // }
+
   function renderLoop(timestamp, frame) {
+    // Rotate box
     box.rotation.y += 0.01;
-    // renderer.render(scene, camera);
 
     if (renderer.xr.isPresenting) {
+
       if (frame) {
         handleXRHitTest(renderer, frame, (hitPoseTransformed) => {
           if (hitPoseTransformed) {
@@ -75,9 +81,6 @@ function initXR() {
       }
       renderer.render(scene, camera);    
     }
-  };
-
-
   }
 
   // 6. Den Animation-Loop starten
