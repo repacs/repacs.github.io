@@ -12,7 +12,6 @@ gltfLoader.load('/assets/models/trash.glb', (gltf) => {
   trashModel = gltf.scene.children[0];
 });
 
-
 export function createGameGroup() {
   const group = new THREE.Group();
 
@@ -24,34 +23,11 @@ export function createGameGroup() {
 
   // Platzier Logik für Mülleimer und Tisch
 
-  // Planemarker erstellen
-  const planeMarker = createPlaneMarker
-  group.add(planeMarker);
-
   // Licht hinzufügen, damit Material sichtbar ist
   const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
   group.add(light);
 
-  const controller = renderer.xr.getController(0);
-  group.add(controller);
-
-  controller.addEventListener('select', onSelect);
-
-  function onSelect() {
-    if (planeMarker.visible) {
-      const model = trashModel.clone();
-
-      model.position.setFromMatrixPosition(planeMarker.matrix);
-      
-      // random rotation
-      model.rotation.y = Math.random() * (Math.PI * 2);
-      model.visible = true;
-
-      model.scale.set(0.12, 0.12, 0.12);
-
-      group.add(model);
-    }
-  };
+  
 
   return { group, box };
 }
