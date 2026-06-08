@@ -14,8 +14,8 @@ export function createMenuGroup(camera, renderer, callbacks) {
   quitButton.userData.onClick  = callbacks.onQuit;
 
   group.add(startButton);
-  // group.add(infoButton);
-  // group.add(quitButton);
+  group.add(infoButton);
+  group.add(quitButton);
   camera.add(group);
 
   const raycaster = new THREE.Raycaster();
