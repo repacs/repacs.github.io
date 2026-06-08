@@ -31,11 +31,11 @@ function initXR() {
       console.log('Starte Spiel!');
       switchTo('game');
     },
-    onInfo: () => console.log('Info lol'),
-    onQuit: () => {
-      console.log('Beende Spiel!');
-      renderer.xr.getSession().end(); // Session beenden
-    } 
+    // onInfo: () => console.log('Info lol'),
+    // onQuit: () => {
+    //   console.log('Beende Spiel!');
+    //   renderer.xr.getSession().end(); // Session beenden
+    // } 
   });
 
   const { group: gameGroup, update: updateGame, planeMarker } = createGameGroup(renderer, scene);
