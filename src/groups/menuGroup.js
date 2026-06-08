@@ -22,10 +22,16 @@ export function createMenuGroup(camera, renderer, callbacks) {
   const controller = renderer.xr.getController(0);
 
   controller.addEventListener('select', () => {
-    raycaster.setFromCamera({ x: 0, y: 0 }, camera);
-
+    // Weltposition der Kamera holen
+    const origin = new THREE.Vector3();
+    const direction = new THREE.Vector3(0, 0, -1);
+    
+    camera.getWorldPosition(origin);
+    camera.getWorldDirection(direction);
+    
+    raycaster.set(origin, direction);
+    
     const hits = raycaster.intersectObjects([startButton, infoButton, quitButton]);
-
     if (hits.length > 0) {
       hits[0].object.userData.onClick?.();
     }
