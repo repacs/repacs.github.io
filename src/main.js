@@ -31,8 +31,14 @@ function initXR() {
       console.log('Starte Spiel!')
       switchTo('game')
     },
-    onInfo: () => console.log('Info'),
-    onQuit: () => console.log('Beende Spiel!'),
+    onInfo: () => {
+      console.log('Info lol'),
+      switchTo('game')
+    }, 
+    onQuit: () => {
+      console.log('Beende Spiel!'),
+      switchTo('game')
+    } 
   });
 
   const { group: gameGroup, box } = createGameGroup();
