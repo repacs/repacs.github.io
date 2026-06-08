@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
-function createButton(label, position, color = 0x2255ff) {
+function createButton(position, color = 0x2255ff) {
   const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(0.3, 0.08, 0.01),
+    new THREE.BoxGeometry(0.5, 0.08, 0.01),
     new THREE.MeshBasicMaterial({ color })
   );
 
@@ -15,9 +15,9 @@ export function createMenuGroup(camera, renderer, callbacks) {
   const group = new THREE.Group();
   group.position.set(0, 0, -1.2);
 
-  const startButton = createButton('Spiel starten', new THREE.Vector3(0, 0.1, 0), 0x2255ff);
-  const infoButton  = createButton('Anleitung',     new THREE.Vector3(0, 0.0, 0), 0x226622);
-  const quitButton  = createButton('Spiel beenden', new THREE.Vector3(0, -0.1, 0), 0x882222);
+  const startButton = createButton(new THREE.Vector3(0,  0.3, 0), 0x2255ff);
+  const infoButton  = createButton(new THREE.Vector3(0,  0.0, 0), 0x226622);
+  const quitButton  = createButton(new THREE.Vector3(0, -0.3, 0), 0x882222);
 
   startButton.userData.onClick = callbacks.onStart;
   infoButton.userData.onClick  = callbacks.onInfo;
@@ -26,7 +26,12 @@ export function createMenuGroup(camera, renderer, callbacks) {
   group.add(startButton);
   group.add(infoButton);
   group.add(quitButton);
-  camera.add(group);
+
+  // An XR-Camera hängen damit es mit der Handy-Bewegung mitgeht
+  renderer.xr.addEventListener('sessionstart', () => {
+    const xrCamera = renderer.xr.getCamera();
+    xrCamera.add(group);
+  });
 
   const raycaster = new THREE.Raycaster();
   const controller = renderer.xr.getController(0);
@@ -47,7 +52,6 @@ export function createMenuGroup(camera, renderer, callbacks) {
     if (hits.length > 0) {
       const hit = hits[0].object;
 
-      // Visuelles Feedback
       hit.material.color.set(0xffffff);
       setTimeout(() => hit.material.color.set(hit.userData.originalColor), 200);
 
