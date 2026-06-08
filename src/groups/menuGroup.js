@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 function createButton(position, color = 0x2255ff) {
   const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(0.5, 0.08, 0.01),
+    new THREE.BoxGeometry(0.3, 0.08, 0.01),
     new THREE.MeshBasicMaterial({ color })
   );
 
@@ -15,9 +15,9 @@ export function createMenuGroup(camera, renderer, callbacks) {
   const group = new THREE.Group();
   group.position.set(0, 0, -1.2);
 
-  const startButton = createButton(new THREE.Vector3(0,  0.3, 0), 0x2255ff);
+  const startButton = createButton(new THREE.Vector3(0,  0.1, 0), 0x2255ff);
   const infoButton  = createButton(new THREE.Vector3(0,  0.0, 0), 0x226622);
-  const quitButton  = createButton(new THREE.Vector3(0, -0.3, 0), 0x882222);
+  const quitButton  = createButton(new THREE.Vector3(0, -0.1, 0), 0x882222);
 
   startButton.userData.onClick = callbacks.onStart;
   infoButton.userData.onClick  = callbacks.onInfo;
