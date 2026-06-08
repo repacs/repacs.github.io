@@ -4,6 +4,7 @@ import { ARButton } from 'three/addons/webxr/ARButton.js';
 import { browserHasImmersiveARCompatibility } from './utils/domUtils';
 import { createGameGroup } from './groups/gameGroup';
 import { createMenuGroup } from './groups/menuGroup';
+import { handleXRHitTest } from './utils/hitTest';
 
 function initXR() {
   // 1. Szene erstellen

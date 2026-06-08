@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { createPlaneMarker } from './objects/planeMarker';
-import { handleXRHitTest } from './utils/hitTest';
+import { handleXRHitTest } from '../utils/hitTest';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { createRedBox } from '../objects/redBox';
+import { createPlaneMarker } from '../objects/planeMarker';
 
 let trashModel;
 
@@ -25,7 +25,7 @@ export function createGameGroup() {
   // Platzier Logik für Mülleimer und Tisch
 
   // Planemarker erstellen
-  const planeMarker = createPlaneMarker();
+  const planeMarker = createPlaneMarker
   group.add(planeMarker);
 
   // Licht hinzufügen, damit Material sichtbar ist
