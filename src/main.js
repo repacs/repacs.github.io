@@ -31,10 +31,7 @@ function initXR() {
       console.log('Starte Spiel!')
       switchTo('game')
     },
-    onInfo: () => {
-      console.log('Info lol'),
-      switchTo('game')
-    }, 
+    onInfo: () => console.log('Info lol'),
     onQuit: () => {
       console.log('Beende Spiel!'),
       renderer.xr.getSession().end(); // Session beenden
@@ -61,9 +58,26 @@ function initXR() {
   // Controller enthält alle Controller-Informationen (Position, Rotation etc.) in Matrix
   // Controller Zeug ist gerade in den Groups
 
-  function renderLoop() {
+  function renderLoop(timestamp, frame) {
     box.rotation.y += 0.01;
-    renderer.render(scene, camera);
+    // renderer.render(scene, camera);
+
+    if (renderer.xr.isPresenting) {
+      if (frame) {
+        handleXRHitTest(renderer, frame, (hitPoseTransformed) => {
+          if (hitPoseTransformed) {
+            planeMarker.visible = true;
+            planeMarker.matrix.fromArray(hitPoseTransformed);
+          }
+        }, () => {
+          planeMarker.visible = false;
+        })
+      }
+      renderer.render(scene, camera);    
+    }
+  };
+
+
   }
 
   // 6. Den Animation-Loop starten

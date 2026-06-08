@@ -3,10 +3,10 @@ import * as THREE from 'three';
 export function createMenuGroup(camera, renderer, callbacks) {
   const group = new THREE.Group();
   group.position.set(0, 0, -1.2); // 1.2 Meter vor der Kamera
-
-  const startButton = createButton('Spiel starten', new THREE.Vector3(0, 0.0, 0)); // mitte
-  const infoButton  = createButton('Anleitung',     new THREE.Vector3(0, 0.2, 0)); // oben
-  const quitButton  = createButton('Spiel beenden', new THREE.Vector3(0, -0.2, 0)); // unten
+                                                                                   
+  const startButton = createButton('Spiel starten', new THREE.Vector3(0, 0.2, 0));
+  const infoButton  = createButton('Anleitung',     new THREE.Vector3(0, 0.0, 0)); 
+  const quitButton  = createButton('Spiel beenden', new THREE.Vector3(0, -0.2, 0)); 
 
   // Callback am Button speichern
   startButton.userData.onClick = callbacks.onStart;
@@ -19,22 +19,13 @@ export function createMenuGroup(camera, renderer, callbacks) {
   camera.add(group);
 
   const raycaster = new THREE.Raycaster();
-  // const controller = renderer.xr.getController(0);
+  const controller = renderer.xr.getController(0);
 
-  // controller.addEventListener('select', () => {
-  //   raycaster.setFromCamera({ x: 0, y: 0 }, camera);
-
-  //   const hits = raycaster.intersectObjects([startButton, infoButton, quitButton]);
-
-  //   if (hits.length > 0) {
-  //     hits[0].object.userData.onClick?.();
-  //   }
-  // });
-
-  renderer.domElement.addEventListener('click', () => {
+  controller.addEventListener('select', () => {
     raycaster.setFromCamera({ x: 0, y: 0 }, camera);
 
     const hits = raycaster.intersectObjects([startButton, infoButton, quitButton]);
+
     if (hits.length > 0) {
       hits[0].object.userData.onClick?.();
     }
