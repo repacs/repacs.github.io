@@ -38,7 +38,7 @@ function initXR() {
     } 
   });
 
-  const { group: gameGroup, update: updateGame } = createGameGroup();
+  const { group: gameGroup, update: updateGame } = createGameGroup(renderer, scene);
 
   scene.add(menuGroup);
   scene.add(gameGroup);
