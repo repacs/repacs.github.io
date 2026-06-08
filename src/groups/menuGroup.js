@@ -31,7 +31,7 @@ export function createMenuGroup(camera, renderer, callbacks) {
     
     raycaster.set(origin, direction);
     
-    const hits = raycaster.intersectObjects([startButton, infoButton, quitButton]);
+    const hits = raycaster.intersectObjects([startButton]); //infoButton, quitButton
     if (hits.length > 0) {
       hits[0].object.userData.onClick?.();
     }
