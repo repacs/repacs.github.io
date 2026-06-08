@@ -19,13 +19,22 @@ export function createMenuGroup(camera, renderer, callbacks) {
   camera.add(group);
 
   const raycaster = new THREE.Raycaster();
-  const controller = renderer.xr.getController(0);
+  // const controller = renderer.xr.getController(0);
 
-  controller.addEventListener('select', () => {
+  // controller.addEventListener('select', () => {
+  //   raycaster.setFromCamera({ x: 0, y: 0 }, camera);
+
+  //   const hits = raycaster.intersectObjects([startButton, infoButton, quitButton]);
+
+  //   if (hits.length > 0) {
+  //     hits[0].object.userData.onClick?.();
+  //   }
+  // });
+
+  renderer.domElement.addEventListener('click', () => {
     raycaster.setFromCamera({ x: 0, y: 0 }, camera);
 
     const hits = raycaster.intersectObjects([startButton, infoButton, quitButton]);
-
     if (hits.length > 0) {
       hits[0].object.userData.onClick?.();
     }
