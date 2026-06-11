@@ -49,7 +49,7 @@ function initXR() {
     group: gameGroup,
     update: updateGame,
     planeMarker,
-  } = createGameGroup(renderer, scene);
+  } = createGameGroup(renderer, scene, camera);
 
   scene.add(menuGroup);
   scene.add(gameGroup);
@@ -61,7 +61,10 @@ function initXR() {
   function switchTo(state) {
     menuGroup.visible = state === "menu";
     gameGroup.visible = state === "game";
-    planeMarker.visible = state === 'game';
+
+    if (state === "menu") {
+      planeMarker.visible = false;
+    }
   }
 
   renderer.xr.addEventListener("sessionend", () => {

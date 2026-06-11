@@ -2,8 +2,9 @@ import * as THREE from "three";
 import { handleXRHitTest } from "../utils/hitTest";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { createPlaneMarker } from "../objects/planeMarker";
+import { spawnBoxes, updateBoxes } from "../objects/boxSpawner";
 
-export function createGameGroup(renderer, scene) {
+export function createGameGroup(renderer, scene, camera) {
   const group = new THREE.Group();
 
   // Platzier Logik für Mülleimer und Tisch
@@ -29,6 +30,9 @@ export function createGameGroup(renderer, scene) {
   let phase = "placing";
   let placedCount = 0;
   const OBJECTS_TO_PLACE = 2;
+
+  //Timer für Boxen
+  let spawnTimer = 0;
 
   // Controller
   const controller = renderer.xr.getController(0);
@@ -82,6 +86,14 @@ export function createGameGroup(renderer, scene) {
           planeMarker.visible = false;
         },
       );
+    } else if (phase === "playing") {
+      spawnTimer++;
+
+      if (spawnTimer >= 100) {
+        spawnBoxes(camera, group);
+        spawnTimer = 0;
+      }
+      updateBoxes(camera, group);
     }
   }
   return { group, update, planeMarker };
