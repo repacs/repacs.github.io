@@ -1,8 +1,7 @@
-import * as THREE from 'three';
-import { handleXRHitTest } from '../utils/hitTest';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { createPlaneMarker } from '../objects/planeMarker';
-
+import * as THREE from "three";
+import { handleXRHitTest } from "../utils/hitTest";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { createPlaneMarker } from "../objects/planeMarker";
 
 export function createGameGroup(renderer, scene) {
   const group = new THREE.Group();
@@ -15,11 +14,10 @@ export function createGameGroup(renderer, scene) {
   const planeMarker = createPlaneMarker();
   scene.add(planeMarker);
 
-
   // GlTF Model
   let trashModel;
   const gltfLoader = new GLTFLoader();
-  gltfLoader.load('/assets/models/trash.glb', (gltf) => {
+  gltfLoader.load("/assets/models/trash.glb", (gltf) => {
     trashModel = gltf.scene.children[0];
   });
 
@@ -28,7 +26,7 @@ export function createGameGroup(renderer, scene) {
   group.add(ambientLight);
 
   // State
-  let phase = 'placing';
+  let phase = "placing";
   let placedCount = 0;
   const OBJECTS_TO_PLACE = 2;
 
@@ -36,12 +34,12 @@ export function createGameGroup(renderer, scene) {
   const controller = renderer.xr.getController(0);
   scene.add(controller);
 
-  controller.addEventListener('select', () => {
+  controller.addEventListener("select", () => {
     if (!group.visible) return;
 
-    if (phase === 'placing') {
+    if (phase === "placing") {
       onPlace();
-    } else if (phase === 'playing') {
+    } else if (phase === "playing") {
       onPlay();
     }
   });
@@ -61,24 +59,29 @@ export function createGameGroup(renderer, scene) {
     planeMarker.visible = false; // nach jedem Platzieren verstecken
 
     if (placedCount >= OBJECTS_TO_PLACE) {
-      phase = 'playing';
-      console.log('Platzierphase vorbei!');
+      phase = "playing";
+      console.log("Platzierphase vorbei!");
     }
   }
 
   function onPlay() {
     // spätere Spiellogik hier
-    console.log('Tap während Spielphase!');
+    console.log("Tap während Spielphase!");
   }
 
   function update(frame) {
-    if (phase === 'placing' && frame) {
-      handleXRHitTest(renderer, frame, (hitPoseTransformed) => {
-        planeMarker.visible = true;
-        planeMarker.matrix.fromArray(hitPoseTransformed);
-      }, () => {
-        planeMarker.visible = false;
-      });
+    if (phase === "placing" && frame) {
+      handleXRHitTest(
+        renderer,
+        frame,
+        (hitPoseTransformed) => {
+          planeMarker.visible = true;
+          planeMarker.matrix.fromArray(hitPoseTransformed);
+        },
+        () => {
+          planeMarker.visible = false;
+        },
+      );
     }
   }
   return { group, update, planeMarker };

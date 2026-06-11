@@ -21,18 +21,23 @@ export function createMenuGroup(camera, renderer, callbacks) {
   const raycaster = new THREE.Raycaster();
   const controller = renderer.xr.getController(0);
 
- controller.addEventListener('select', () => {
-    const tempMatrix = new THREE.Matrix4();
-    tempMatrix.identity().extractRotation(controller.matrixWorld);
+  let processing = false;
+  controller.addEventListener('select', () => {
 
-    raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
-    raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
-
-    const hits = raycaster.intersectObjects([startButton, infoButton]);
-
-    if (hits.length > 0) {
-      hits[0].object.userData.onClick?.();
-    }
+    if (processing) return;
+    processing = true;
+      const tempMatrix = new THREE.Matrix4();
+      tempMatrix.identity().extractRotation(controller.matrixWorld);
+  
+      raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+      raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+  
+      const hits = raycaster.intersectObjects([startButton, infoButton]);
+  
+      if (hits.length > 0) {
+        hits[0].object.userData.onClick?.();
+      }
+    setTimeout(() => { processing = false; }, 100);
   });
 
   return group;

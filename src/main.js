@@ -1,16 +1,21 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
-import { ARButton } from 'three/addons/webxr/ARButton.js';
-import { browserHasImmersiveARCompatibility } from './utils/domUtils';
-import { createGameGroup } from './groups/gameGroup';
-import { createMenuGroup } from './groups/menuGroup';
+import { ARButton } from "three/addons/webxr/ARButton.js";
+import { browserHasImmersiveARCompatibility } from "./utils/domUtils";
+import { createGameGroup } from "./groups/gameGroup";
+import { createMenuGroup } from "./groups/menuGroup";
 
 function initXR() {
   // 1. Szene erstellen
   const scene = new THREE.Scene();
 
   // 2. Kamera erstellen (PerspectiveCamera wird für 3D-Szenen empfohlen)
-  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.02, 20);
+  const camera = new THREE.PerspectiveCamera(
+    70,
+    window.innerWidth / window.innerHeight,
+    0.02,
+    20,
+  );
   scene.add(camera);
 
   // 3. Renderer erstellen und XR aktivieren
@@ -22,23 +27,29 @@ function initXR() {
   renderer.xr.enabled = true;
 
   // 4. Start AR-Button zum Interface hinzufügen
-  const arButton = ARButton.createButton(renderer, { requiredFeatures: ["hit-test"] });
-  document.querySelector('#ui').appendChild(arButton);
+  const arButton = ARButton.createButton(renderer, {
+    requiredFeatures: ["hit-test"],
+  });
+  document.querySelector("#ui").appendChild(arButton);
 
-  // 5. Steuerung von Groups, Szenenmanagement 
+  // 5. Steuerung von Groups, Szenenmanagement
   const menuGroup = createMenuGroup(camera, renderer, {
     onStart: () => {
-      console.log('Starte Spiel!');
-      switchTo('game');
+      console.log("Starte Spiel!");
+      switchTo("game");
     },
-    onInfo: () => console.log('Info lol'),
+    onInfo: () => console.log("Info lol"),
     onQuit: () => {
-      console.log('Beende Spiel!');
+      console.log("Beende Spiel!");
       renderer.xr.getSession().end(); // Session beenden
-    } 
+    },
   });
 
-  const { group: gameGroup, update: updateGame, planeMarker } = createGameGroup(renderer, scene);
+  const {
+    group: gameGroup,
+    update: updateGame,
+    planeMarker,
+  } = createGameGroup(renderer, scene);
 
   scene.add(menuGroup);
   scene.add(gameGroup);
@@ -48,15 +59,15 @@ function initXR() {
   planeMarker.visible = false;
 
   function switchTo(state) {
-    menuGroup.visible = state === 'menu';
-    gameGroup.visible = state === 'game';
+    menuGroup.visible = state === "menu";
+    gameGroup.visible = state === "game";
     planeMarker.visible = state === 'game';
   }
 
-  renderer.xr.addEventListener('sessionend', () => {
-    switchTo('menu'); // zurück zum Menü wenn Session endet 
+  renderer.xr.addEventListener("sessionend", () => {
+    switchTo("menu"); // zurück zum Menü wenn Session endet
   });
-  
+
   // Controller enthält alle Controller-Informationen (Position, Rotation etc.) in Matrix
   // Controller Zeug ist gerade in den Groups
 
@@ -69,7 +80,7 @@ function initXR() {
 
   // 6. Den Animation-Loop starten
   renderer.setAnimationLoop(renderLoop);
-};
+}
 
 async function start() {
   const immersiveARSupported = await browserHasImmersiveARCompatibility;
@@ -77,8 +88,8 @@ async function start() {
   if (immersiveARSupported) {
     initXR();
   } else {
-    console.log('Browser does not WebXR');
+    console.log("Browser does not WebXR");
   }
-};
+}
 
-start(); // Spiel startet, wenn Browser XR kompatibel ist 
+start(); // Spiel startet, wenn Browser XR kompatibel ist
