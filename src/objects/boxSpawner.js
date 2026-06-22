@@ -1,13 +1,16 @@
 import * as THREE from "three";
 
-const boxes = [];
+export const boxes = [];
 const MAX_BOXES = 100;
 const SPAWN_DISTANCE = 2.0;
 
-export function spawnBoxes(playerTarget, targetGroup) {
-  const playerPos = new THREE.Vector3();
-  playerTarget.getWorldPosition(playerPos);
+export function spawnBoxes(targetMesh, targetGroup) {
+  if (!targetMesh) return;
 
+  const targetPos = new THREE.Vector3();
+  targetMesh.getWorldPosition(targetPos);
+
+  // Spawnt Boxen in einem Radius um den Tisch herum
   const randomDir = new THREE.Vector3(
     Math.random() - 0.5,
     Math.random() - 0.5,
@@ -22,7 +25,13 @@ export function spawnBoxes(playerTarget, targetGroup) {
   });
   const box = new THREE.Mesh(geometry, material);
 
-  box.position.copy(playerPos).add(randomDir);
+  box.position.copy(targetPos).add(randomDir);
+
+  // Status-Daten für den Tisch-Timer vorbereiten
+  box.userData = {
+    reachedTarget: false,
+    reachedTime: 0,
+  };
 
   targetGroup.add(box);
   boxes.push(box);
@@ -32,31 +41,62 @@ export function spawnBoxes(playerTarget, targetGroup) {
   }
 }
 
-export function updateBoxes(playerTarget, targetGroup) {
-  const playerPos = new THREE.Vector3();
-  playerTarget.getWorldPosition(playerPos);
+export function updateBoxes(targetMesh, targetGroup) {
+  if (!targetMesh) return;
+
+  const targetPos = new THREE.Vector3();
+  targetMesh.getWorldPosition(targetPos);
+  const currentTime = performance.now();
 
   for (let i = boxes.length - 1; i >= 0; i--) {
     const box = boxes[i];
 
-    box.position.lerp(playerPos, 0.015); //0.015 steuert Fluggeschwindigkeit
+    // Wenn die Box vom Controller gegriffen ist, überspringen wir das Update hier
+    if (box.parent !== targetGroup) {
+      continue;
+    }
+
+    // Logik, wenn die Box den Tisch bereits erreicht hat
+    if (box.userData.reachedTarget) {
+      // Falls der Spieler die Box greift und woanders fallen lässt,
+      // soll sie sich wieder zum Tisch bewegen (Zurücksetzen)
+      if (box.position.distanceTo(targetPos) > 0.2) {
+        box.userData.reachedTarget = false;
+        continue;
+      }
+
+      // Prüfen, ob 5 Sekunden (5000ms) vergangen sind
+      if (currentTime - box.userData.reachedTime >= 5000) {
+        removeBox(box, targetGroup);
+        console.log("Box hat sich nach 5 Sekunden auf dem Tisch aufgelöst.");
+      }
+      continue; // Keine Bewegung mehr berechnen, da sie am Tisch liegt
+    }
+
+    // Auf den Tisch zubewegen
+    box.position.lerp(targetPos, 0.015);
     box.rotation.x += 0.05;
     box.rotation.y += 0.05;
 
-    if (box.position.distanceTo(playerPos) < 0.05) {
-      // Abstand Spieler zur Box
-      removeBox(box, targetGroup);
-      console.log("Box hat den Spieler berührt");
+    // Überprüfung, ob der Tisch erreicht wurde (Distanz-Schwellenwert ca. 10cm)
+    if (box.position.distanceTo(targetPos) < 0.1) {
+      box.userData.reachedTarget = true;
+      box.userData.reachedTime = currentTime;
+      console.log("Box liegt auf dem Tisch. 5-Sekunden-Timer gestartet.");
     }
   }
 }
 
-function removeBox(box, targetGroup) {
+export function removeBox(box, targetGroup) {
   const index = boxes.indexOf(box);
   if (index > -1) {
     boxes.splice(index, 1);
   }
-  targetGroup.remove(box);
+
+  if (box.parent) {
+    box.parent.remove(box);
+  }
+
   box.geometry.dispose();
   box.material.dispose();
 }

@@ -2,7 +2,12 @@ import * as THREE from "three";
 import { handleXRHitTest } from "../utils/hitTest";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { createPlaneMarker } from "../objects/planeMarker";
-import { spawnBoxes, updateBoxes } from "../objects/boxSpawner";
+import {
+  spawnBoxes,
+  updateBoxes,
+  boxes,
+  removeBox,
+} from "../objects/boxSpawner";
 
 export function createGameGroup(renderer, scene, camera) {
   const group = new THREE.Group();
@@ -15,11 +20,17 @@ export function createGameGroup(renderer, scene, camera) {
   const planeMarker = createPlaneMarker();
   scene.add(planeMarker);
 
-  // GlTF Model
+  // GlTF Modelle laden
   let trashModel;
+  let deskModel;
   const gltfLoader = new GLTFLoader();
+
   gltfLoader.load("/assets/models/trash.glb", (gltf) => {
     trashModel = gltf.scene.children[0];
+  });
+
+  gltfLoader.load("/assets/models/desk.glb", (gltf) => {
+    deskModel = gltf.scene.children[0];
   });
 
   // Licht
@@ -31,7 +42,13 @@ export function createGameGroup(renderer, scene, camera) {
   let placedCount = 0;
   const OBJECTS_TO_PLACE = 2;
 
-  //Timer für Boxen
+  // Referenz für den platzierten Tisch
+  let deskMesh = null;
+
+  // Variable für gehaltene Box
+  let grabbedObject = null;
+
+  // Timer für Boxen
   let spawnTimer = 0;
 
   // Controller
@@ -48,28 +65,93 @@ export function createGameGroup(renderer, scene, camera) {
     }
   });
 
+  controller.addEventListener("selectstart", () => {
+    if (!group.visible || phase !== "playing") return;
+
+    const raycaster = new THREE.Raycaster();
+    const tempMatrix = new THREE.Matrix4();
+
+    tempMatrix.extractRotation(controller.matrixWorld);
+    raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+    raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+
+    const intersects = raycaster.intersectObjects(boxes);
+
+    if (intersects.length > 0) {
+      grabbedObject = intersects[0].object;
+      controller.attach(grabbedObject);
+      console.log("Box erfolgreich gegriffen.");
+    }
+  });
+
+  controller.addEventListener("selectend", () => {
+    if (!grabbedObject) return;
+
+    let putInTrash = false;
+    const TRASH_DISTANCE_THRESHOLD = 0.35;
+
+    const boxWorldPos = new THREE.Vector3();
+    grabbedObject.getWorldPosition(boxWorldPos);
+
+    for (const trash of placeableGroup.children) {
+      // Ignoriere den Tisch bei der Mülleimer-Überprüfung
+      if (trash === deskMesh) continue;
+
+      const trashWorldPos = new THREE.Vector3();
+      trash.getWorldPosition(trashWorldPos);
+
+      if (boxWorldPos.distanceTo(trashWorldPos) < TRASH_DISTANCE_THRESHOLD) {
+        putInTrash = true;
+        break;
+      }
+    }
+
+    if (putInTrash) {
+      console.log("Treffer! Box im Mülleimer entsorgt.");
+      removeBox(grabbedObject, group);
+    } else {
+      console.log("Daneben! Box fliegt im Raum weiter.");
+      group.attach(grabbedObject);
+    }
+
+    grabbedObject = null;
+  });
+
   function onPlace() {
-    if (!planeMarker.visible || !trashModel) return;
+    if (!planeMarker.visible) return;
 
-    const model = trashModel.clone();
-    model.position.setFromMatrixPosition(planeMarker.matrix);
-    model.rotation.y = Math.random() * (Math.PI * 2);
-    model.scale.set(0.12, 0.12, 0.12);
-    model.visible = true;
+    let modelToPlace = null;
 
-    placeableGroup.add(model);
+    // 1. Klick = Tisch platzieren | 2. Klick = Mülleimer platzieren
+    if (placedCount === 0 && deskModel) {
+      modelToPlace = deskModel.clone();
+    } else if (placedCount === 1 && trashModel) {
+      modelToPlace = trashModel.clone();
+    }
+
+    if (!modelToPlace) return;
+
+    modelToPlace.position.setFromMatrixPosition(planeMarker.matrix);
+    modelToPlace.rotation.y = Math.random() * (Math.PI * 2);
+    modelToPlace.scale.set(0.12, 0.12, 0.12);
+    modelToPlace.visible = true;
+
+    placeableGroup.add(modelToPlace);
+
+    if (placedCount === 0) {
+      deskMesh = modelToPlace; // Tisch-Referenz merken
+    }
+
     placedCount++;
-
     planeMarker.visible = false; // nach jedem Platzieren verstecken
 
     if (placedCount >= OBJECTS_TO_PLACE) {
       phase = "playing";
-      console.log("Platzierphase vorbei!");
+      console.log("Platzierphase vorbei! Spiel startet.");
     }
   }
 
   function onPlay() {
-    // spätere Spiellogik hier
     console.log("Tap während Spielphase!");
   }
 
@@ -89,11 +171,12 @@ export function createGameGroup(renderer, scene, camera) {
     } else if (phase === "playing") {
       spawnTimer++;
 
+      // Wir übergeben jetzt das deskMesh statt der camera
       if (spawnTimer >= 100) {
-        spawnBoxes(camera, group);
+        spawnBoxes(deskMesh, group);
         spawnTimer = 0;
       }
-      updateBoxes(camera, group);
+      updateBoxes(deskMesh, group);
     }
   }
   return { group, update, planeMarker };
