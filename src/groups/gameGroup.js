@@ -9,7 +9,7 @@ import {
   removeBox,
 } from "../objects/boxSpawner";
 
-export function createGameGroup(renderer, scene, camera) {
+export function createGameGroup(renderer, scene, camera, listener) {
   const group = new THREE.Group();
 
   // Platzier Logik für Mülleimer und Tisch
@@ -173,7 +173,7 @@ export function createGameGroup(renderer, scene, camera) {
 
       // Wir übergeben jetzt das deskMesh statt der camera
       if (spawnTimer >= 100) {
-        spawnBoxes(deskMesh, group);
+        spawnBoxes(deskMesh, group, listener);
         spawnTimer = 0;
       }
       updateBoxes(deskMesh, group);

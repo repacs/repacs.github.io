@@ -4,7 +4,18 @@ export const boxes = [];
 const MAX_BOXES = 100;
 const SPAWN_DISTANCE = 2.0;
 
-export function spawnBoxes(targetMesh, targetGroup) {
+let spawnBuffer = null;
+
+export function loadSounds() {
+  const loader = new THREE.AudioLoader();
+
+  loader.load("/assets/sounds/mail.mp3", (buffer) => {
+    spawnBuffer = buffer;
+    console.log('Mail Sound geladen')
+  });
+}
+
+export function spawnBoxes(targetMesh, targetGroup, listener) {
   if (!targetMesh) return;
 
   const targetPos = new THREE.Vector3();
@@ -35,6 +46,18 @@ export function spawnBoxes(targetMesh, targetGroup) {
 
   targetGroup.add(box);
   boxes.push(box);
+  // playSpawnSound();
+  if (spawnBuffer) {
+    const sound = new THREE.PositionalAudio(listener);
+
+    sound.setBuffer(spawnBuffer);
+    sound.setRefDistance(1.5);
+    sound.setVolume(0.4);
+
+    box.add(sound);
+    sound.play();
+  }
+
 
   if (boxes.length > MAX_BOXES) {
     removeBox(boxes[0], targetGroup);
@@ -93,10 +116,24 @@ export function removeBox(box, targetGroup) {
     boxes.splice(index, 1);
   }
 
+   // Audio stoppen
+  box.traverse((obj) => {
+    if (obj.isAudio) {
+      obj.stop();
+    }
+  });
+
   if (box.parent) {
     box.parent.remove(box);
   }
 
   box.geometry.dispose();
   box.material.dispose();
+
+}
+
+function playSpawnSound() {
+  const sound = new Audio("/assets/sounds/mail.mp3");
+  sound.volume = 0.4;
+  sound.play();
 }
