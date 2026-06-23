@@ -37,6 +37,8 @@ export function createMenuGroup(camera, renderer, callbacks) {
   const controller = renderer.xr.getController(0);
 
   controller.addEventListener("select", () => {
+    if (!group.visible) return;
+    
     const tempMatrix = new THREE.Matrix4();
     tempMatrix.identity().extractRotation(controller.matrixWorld);
 
